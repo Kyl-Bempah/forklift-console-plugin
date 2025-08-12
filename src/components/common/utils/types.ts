@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-import type { SelectOptionObject } from '@patternfly/react-core/deprecated';
-import type { ThInfoType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
+import type { SelectOptionProps } from '@patternfly/react-core';
+import type { ThProps } from '@patternfly/react-table';
 
 export type EnumGroup = {
   groupId: string;
@@ -30,6 +30,7 @@ export type FilterDef = {
   fieldLabel?: string;
   primary?: boolean;
   standalone?: boolean;
+  excludeFromClearFilters?: boolean;
   groups?: EnumGroup[];
   // override default behavior if there are no filters provided by the user
   // by default missing/empty filters result in positive match (vacuous truth)
@@ -56,7 +57,7 @@ export type ResourceField = {
   filter?: FilterDef;
   // if true then the field filters state should persist between sessions
   isPersistent?: boolean;
-  info?: ThInfoType;
+  info?: ThProps['info'];
   compareFn?: (a: string, b: string, locale: string) => number;
   defaultSortDirection?: SortDirection;
 };
@@ -70,10 +71,12 @@ export type GlobalActionToolbarProps<T> = {
 /**
  * @typedef {Object} SelectValueType
  * @description Represents the possible value types that can be used for select actions.
- *
- * @property {string} string .
- * @property {SelectOptionObject} SelectOptionObject
+ * Must have a toString() method for compatibility with existing select handlers.
  */
-export type SelectValueType = string | SelectOptionObject;
+export type SelectValueType =
+  | string
+  | (Pick<SelectOptionProps, 'value' | 'isDisabled' | 'children'> & {
+      toString: () => string;
+    });
 
 export type SortDirection = 'asc' | 'desc';

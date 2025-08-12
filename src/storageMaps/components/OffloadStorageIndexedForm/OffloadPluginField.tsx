@@ -1,17 +1,14 @@
-import type { FC } from 'react';
+import { type FC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { HelpIconPopover } from '@components/common/HelpIconPopover/HelpIconPopover';
-import MtvSelect from '@components/common/MtvSelect';
+import Select from '@components/common/Select';
 import { FormGroup, Stack, StackItem } from '@patternfly/react-core';
 import { useForkliftTranslation } from '@utils/i18n';
 
-import {
-  offloadPluginLabels,
-  offloadPlugins,
-  StorageMapFieldId,
-  storageMapFieldLabels,
-} from '../../constants';
+import { StorageMapFieldId, storageMapFieldLabels } from '../../constants';
+import { useOffloadPlugins } from '../../hooks/useOffloadPlugins';
+import { getPluginLabel } from '../../utils/labelHelpers';
 
 type OffloadPluginFieldProps = { fieldId: string };
 
@@ -21,11 +18,16 @@ const OffloadPluginField: FC<OffloadPluginFieldProps> = ({ fieldId }) => {
     control,
     formState: { isSubmitting },
   } = useFormContext();
+  const { loading, offloadPlugins } = useOffloadPlugins();
 
-  const options = offloadPlugins.map((plugin) => ({
-    label: offloadPluginLabels[plugin],
-    value: plugin,
-  }));
+  const options = useMemo(
+    () =>
+      offloadPlugins.map((plugin) => ({
+        label: getPluginLabel(plugin),
+        value: plugin,
+      })),
+    [offloadPlugins],
+  );
 
   return (
     <FormGroup
@@ -52,9 +54,10 @@ const OffloadPluginField: FC<OffloadPluginFieldProps> = ({ fieldId }) => {
         name={fieldId}
         control={control}
         render={({ field }) => (
-          <MtvSelect
+          <Select
+            ref={field.ref}
             id={fieldId}
-            isDisabled={isSubmitting}
+            isDisabled={isSubmitting || loading}
             value={field.value}
             options={options}
             onSelect={(_event, value) => {

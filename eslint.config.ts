@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @cspell/spellchecker */
 
@@ -39,7 +40,6 @@ export const createEslintConfig = (ideMode = false) =>
         'yarn.lock',
         'package-lock.json',
         '**/generated/**',
-        'testing/cypress.config.ts',
       ],
     },
     eslint.configs.all,
@@ -150,7 +150,15 @@ export const createEslintConfig = (ideMode = false) =>
             skipComments: true,
           },
         ],
-        'max-lines-per-function': ['error', 150],
+        'max-lines-per-function': [
+          'error',
+          {
+            IIFEs: true,
+            max: 150,
+            skipBlankLines: true,
+            skipComments: true,
+          },
+        ],
         'max-statements': 'off',
         'new-cap': [
           'error',
@@ -172,6 +180,38 @@ export const createEslintConfig = (ideMode = false) =>
                 name: 'react',
               },
             ],
+          },
+        ],
+        'no-restricted-syntax': [
+          'warn',
+          {
+            message: "Use the custom Select from '@components/common/Select' for consistency.",
+            selector:
+              'Program:has(ImportDeclaration[source.value="@patternfly/react-core"] ImportSpecifier[imported.name="Select"]) JSXElement[openingElement.name.name="Select"]',
+          },
+          {
+            message:
+              "Use 'isEmpty()' or '!isEmpty()' from '@utils/helpers' instead of manual length checks.",
+            selector: [
+              'BinaryExpression[operator="==="][left.type="MemberExpression"][left.object.type="CallExpression"][left.object.callee.type="MemberExpression"][left.object.callee.object.name="Object"][left.object.callee.property.name="keys"][left.property.name="length"][right.type="Literal"][right.value=0]',
+              'BinaryExpression[operator="==="][left.type="MemberExpression"][left.property.name="length"][right.type="Literal"][right.value=0]:not([left.object.type="CallExpression"])',
+              'UnaryExpression[operator="!"][argument.type="MemberExpression"][argument.property.name="length"]',
+              'BinaryExpression[operator=">"][left.type="MemberExpression"][left.property.name="length"][right.type="Literal"][right.value=0]',
+            ].join(','),
+          },
+          {
+            message:
+              "Use ButtonVariant enum from '@patternfly/react-core' instead of string literals for button variants.",
+            selector:
+              'JSXOpeningElement[name.name="Button"] > JSXAttribute[name.name="variant"][value.type="Literal"][value.value=/^(primary|secondary|tertiary|danger|warning|link|plain|control)$/]',
+          },
+          {
+            message: "Use 'testId' instead of 'dataTestId' for consistency across the codebase.",
+            selector: [
+              'JSXAttribute[name.name="dataTestId"]',
+              'TSPropertySignature[key.name="dataTestId"]',
+              'Property[key.name="dataTestId"]',
+            ].join(','),
           },
         ],
         'no-ternary': 'off',
@@ -243,9 +283,23 @@ export const createEslintConfig = (ideMode = false) =>
         },
       },
     },
+    // TypeaheadSelect component specific rules
+    {
+      files: ['**/TypeaheadSelect/*.tsx'],
+      rules: {
+        'no-restricted-syntax': 'off',
+      },
+    },
+    // Helpers directory specific rules
+    {
+      files: ['**/utils/helpers.ts'],
+      rules: {
+        'no-restricted-syntax': 'off',
+      },
+    },
     // Testing directory specific rules
     {
-      files: ['testing/**/*.{js,ts,jsx,tsx}'],
+      files: ['testing/**/*.{js,ts,jsx,tsx}', '**/__{tests,mocks}__/**/*.{js,ts,jsx,tsx}'],
       rules: {
         '@cspell/spellchecker': 'off',
         '@typescript-eslint/class-methods-use-this': 'off',
@@ -255,6 +309,7 @@ export const createEslintConfig = (ideMode = false) =>
         '@typescript-eslint/no-namespace': 'off',
         'max-lines-per-function': 'off',
         'perfectionist/sort-objects': 'off',
+        'react-refresh/only-export-components': 'off',
         'require-unicode-regexp': 'off',
       },
     },

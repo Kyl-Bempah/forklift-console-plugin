@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useForkliftTranslation } from 'src/utils/i18n';
 
-import { Button, DataList } from '@patternfly/react-core';
+import { Button, ButtonVariant, DataList } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import type { Mapping } from '../utils/types';
@@ -12,6 +12,7 @@ type MappingListProps = {
   mappings: Mapping[];
   availableSources?: string[];
   availableDestinations?: string[];
+  additionalDestinations?: string[];
   replaceMapping?: (val: { current: Mapping; next: Mapping }) => void;
   deleteMapping?: (mapping: Mapping) => void;
   addMapping?: () => void;
@@ -22,6 +23,7 @@ type MappingListProps = {
 };
 
 const MappingList: FC<MappingListProps> = ({
+  additionalDestinations,
   addMapping,
   availableDestinations,
   availableSources,
@@ -44,6 +46,7 @@ const MappingList: FC<MappingListProps> = ({
             destination={destination}
             sources={availableSources}
             destinations={availableDestinations}
+            additionalDestinations={additionalDestinations}
             replaceMapping={replaceMapping}
             deleteMapping={deleteMapping}
             index={index}
@@ -58,7 +61,7 @@ const MappingList: FC<MappingListProps> = ({
         <Button
           onClick={addMapping}
           type="button"
-          variant="link"
+          variant={ButtonVariant.link}
           isDisabled={isDisabled}
           icon={<PlusCircleIcon />}
         >

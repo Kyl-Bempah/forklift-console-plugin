@@ -10,12 +10,13 @@ import type {
   V1NetworkAttachmentDefinition,
   VSphereNetwork,
 } from '@kubev2v/types';
+import { POD_NETWORK } from '@utils/constants';
 
 import useProviderInventory from './useProviderInventory';
 
 const podNetwork: InventoryNetwork = {
   id: 'pod',
-  name: 'Pod network',
+  name: POD_NETWORK,
   namespace: '',
   object: undefined,
   providerType: 'openshift',
@@ -44,7 +45,7 @@ export const useSourceNetworks = (
   } = useProviderInventory<InventoryNetwork[]>({
     disabled: !provider,
     provider,
-    subPath: providerType === 'openshift' ? '/networkattachmentdefinitions' : '/networks',
+    subPath: providerType === 'openshift' ? 'networkattachmentdefinitions' : 'networks',
   });
 
   const typedNetworks = useMemo(() => {
@@ -73,7 +74,7 @@ export const useOpenShiftNetworks = (
   } = useProviderInventory<OpenShiftNetworkAttachmentDefinition[]>({
     disabled: !provider || !isOpenShift,
     provider,
-    subPath: '/networkattachmentdefinitions',
+    subPath: 'networkattachmentdefinitions',
   });
 
   const typedNetworks: OpenShiftNetworkAttachmentDefinition[] = useMemo(

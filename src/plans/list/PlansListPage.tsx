@@ -41,17 +41,16 @@ const PlansListPage: FC<PlansListPageProps> = ({ namespace }) => {
     <StandardPage
       data-testid="plans-list"
       addButton={
-        <PlansAddButton
-          dataTestId="create-plan-button"
-          namespace={namespace}
-          canCreate={canCreate}
-        />
+        <PlansAddButton testId="create-plan-button" namespace={namespace} canCreate={canCreate} />
       }
       dataSource={[plans || [], plansLoaded, plansLoadError]}
       RowMapper={PlanRow}
       fieldsMetadata={planFields}
       namespace={namespace}
       title={t('Migration plans')}
+      titleHelpContent={t(
+        'A migration plan is a strategy for moving VMs from 1 environment to OpenShift Virtualization. It lets you group VMs to be migrated together or with the same migration configuration.',
+      )}
       userSettings={userSettings}
       customNoResultsFound={<PlansEmptyState namespace={namespace} />}
       page={INITIAL_PAGE}

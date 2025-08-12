@@ -3,7 +3,7 @@ import { enumToTuple } from 'src/components/common/FilterGroup/helpers';
 import { loadUserSettings } from 'src/components/common/Page/userSettings';
 import StandardPage from 'src/components/page/StandardPage';
 import useGetDeleteAndEditAccessReview from 'src/modules/Providers/hooks/useGetDeleteAndEditAccessReview';
-import { useForkliftTranslation } from 'src/utils/i18n';
+import StorageMapsEmptyState from 'src/storageMaps/components/StorageMapsEmptyState';
 
 import {
   StorageMapModel,
@@ -14,7 +14,6 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { t } from '@utils/i18n';
 
 import StorageMapsAddButton from '../../components/StorageMapsAddButton';
-import StorageMapsEmptyState from '../../components/StorageMapsEmptyState';
 import { STORAGE_MAP_STATUS } from '../../utils/constants/storage-map-status';
 import { getStorageMapPhase } from '../../utils/helpers/getStorageMapPhase';
 import type { StorageMapData } from '../../utils/types/StorageMapData';
@@ -23,7 +22,7 @@ import StorageMapRow from './StorageMapRow';
 
 import './StorageMapsListPage.style.css';
 
-export const fieldsMetadata = [
+const fieldsMetadata = [
   {
     filter: {
       placeholderLabel: t('Filter by name'),
@@ -106,8 +105,6 @@ export const fieldsMetadata = [
 const StorageMapsListPage: FC<{
   namespace: string;
 }> = ({ namespace }) => {
-  const { t } = useForkliftTranslation();
-
   const userSettings = useMemo(() => loadUserSettings({ pageId: 'StorageMaps' }), []);
 
   const [StorageMaps, StorageMapsLoaded, StorageMapsLoadError] = useK8sWatchResource<
@@ -129,45 +126,25 @@ const StorageMapsListPage: FC<{
     permissions,
   }));
 
-  const EmptyState = (
-    <EmptyState_
-      AddButton={
-        <StorageMapsAddButton
-          namespace={namespace}
-          dataTestId="add-network-map-button-empty-state"
-        />
-      }
-      namespace={namespace}
-    />
-  );
-
   return (
     <StandardPage<StorageMapData>
       data-testid="network-maps-list"
-      addButton={
-        permissions.canCreate && (
-          <StorageMapsAddButton namespace={namespace} dataTestId="add-network-map-button" />
-        )
-      }
+      {...(permissions.canCreate && {
+        addButton: <StorageMapsAddButton namespace={namespace} testId="add-network-map-button" />,
+      })}
       dataSource={[data || [], StorageMapsLoaded, StorageMapsLoadError]}
       RowMapper={StorageMapRow}
       fieldsMetadata={fieldsMetadata}
       namespace={namespace}
       title={t('Storage maps')}
+      titleHelpContent={t(
+        'Storage maps define how the storage of source VMs will be provisioned on the target cluster by linking source storage entities to target storage classes.',
+      )}
       userSettings={userSettings}
-      customNoResultsFound={EmptyState}
+      customNoResultsFound={<StorageMapsEmptyState namespace={namespace} />}
       page={1}
     />
   );
-};
-
-type EmptyStateProps = {
-  AddButton: JSX.Element;
-  namespace?: string;
-};
-
-const EmptyState_: FC<EmptyStateProps> = ({ namespace }) => {
-  return <StorageMapsEmptyState namespace={namespace} />;
 };
 
 export default StorageMapsListPage;

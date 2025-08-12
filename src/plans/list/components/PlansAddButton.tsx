@@ -5,15 +5,15 @@ import { useHasSufficientProviders } from 'src/utils/fetch';
 import { useForkliftTranslation } from 'src/utils/i18n';
 
 import { PlanModelRef } from '@kubev2v/types';
-import { Button, Tooltip } from '@patternfly/react-core';
+import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 
 type PlansAddButtonProps = {
   namespace?: string;
-  dataTestId?: string;
+  testId?: string;
   canCreate?: boolean;
 };
 
-const PlansAddButton: FC<PlansAddButtonProps> = ({ canCreate, dataTestId, namespace }) => {
+const PlansAddButton: FC<PlansAddButtonProps> = ({ canCreate, namespace, testId }) => {
   const { t } = useForkliftTranslation();
   const navigate = useNavigate();
   const hasSufficientProviders = useHasSufficientProviders(namespace);
@@ -32,8 +32,8 @@ const PlansAddButton: FC<PlansAddButtonProps> = ({ canCreate, dataTestId, namesp
 
   const button = (
     <Button
-      data-testid={dataTestId}
-      variant="primary"
+      data-testid={testId}
+      variant={ButtonVariant.primary}
       isAriaDisabled={!hasSufficientProviders}
       onClick={onClick}
       isDisabled={!canCreate}

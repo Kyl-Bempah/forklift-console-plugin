@@ -59,7 +59,7 @@ const ProvidersListPage: FC<{
       data-testid="providers-list"
       addButton={
         <ProvidersAddButton
-          dataTestId="add-provider-button"
+          testId="add-provider-button"
           namespace={namespace}
           canCreate={permissions.canCreate}
         />
@@ -69,6 +69,9 @@ const ProvidersListPage: FC<{
       fieldsMetadata={providerFields()}
       namespace={namespace}
       title={t('Providers')}
+      titleHelpContent={t(
+        'Providers refer to environments where the virtual machines originate from or are moved to during the migration process.',
+      )}
       userSettings={userSettings}
       alerts={
         !inventoryLoading && inventoryError

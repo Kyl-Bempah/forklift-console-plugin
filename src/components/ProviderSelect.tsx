@@ -1,18 +1,26 @@
-import { type ComponentProps, type FC, type ReactNode, useMemo } from 'react';
+import { type ComponentProps, type ForwardedRef, forwardRef, type ReactNode, useMemo } from 'react';
 import { getResourceUrl } from 'src/modules/Providers/utils/helpers/getResourceUrl';
+import { getProviderTypeIcon } from 'src/plans/details/utils/constants';
 import { PROVIDER_TYPES } from 'src/providers/utils/constants';
 
 import { ExternalLink } from '@components/common/ExternalLink/ExternalLink';
-import Select from '@components/common/MtvSelect';
+import Select from '@components/common/Select';
 import {
   ProviderModelGroupVersionKind,
   ProviderModelRef,
   type V1beta1Provider,
 } from '@kubev2v/types';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { EmptyState, EmptyStateVariant, SelectList, SelectOption } from '@patternfly/react-core';
+import {
+  EmptyState,
+  EmptyStateVariant,
+  Icon,
+  SelectList,
+  SelectOption,
+} from '@patternfly/react-core';
 import { getName } from '@utils/crds/common/selectors';
 import { isEmpty } from '@utils/helpers';
+import { useIsDarkTheme } from '@utils/hooks/useIsDarkTheme';
 import { ForkliftTrans } from '@utils/i18n';
 import { ProviderStatus } from '@utils/types';
 
@@ -29,18 +37,22 @@ type ProviderSelectProps = Pick<
   testId?: string;
 };
 
-const ProviderSelect: FC<ProviderSelectProps> = ({
-  emptyState,
-  id,
-  isDisabled,
-  isTarget,
-  namespace,
-  onSelect,
-  placeholder,
-  status,
-  testId,
-  value,
-}) => {
+const ProviderSelect = (
+  {
+    emptyState,
+    id,
+    isDisabled,
+    isTarget,
+    namespace,
+    onSelect,
+    placeholder,
+    status,
+    testId,
+    value,
+  }: ProviderSelectProps,
+  ref: ForwardedRef<HTMLButtonElement>,
+) => {
+  const isDarkTheme = useIsDarkTheme();
   const [providers] = useK8sWatchResource<V1beta1Provider[]>({
     groupVersionKind: ProviderModelGroupVersionKind,
     isList: true,
@@ -79,6 +91,7 @@ const ProviderSelect: FC<ProviderSelectProps> = ({
       placeholder={placeholder}
       isDisabled={isDisabled}
       testId={testId}
+      ref={ref}
     >
       <SelectList>
         {isEmpty(filteredProviders)
@@ -97,7 +110,13 @@ const ProviderSelect: FC<ProviderSelectProps> = ({
               const providerName = getName(provider);
 
               return (
-                <SelectOption key={providerName} value={provider}>
+                <SelectOption
+                  icon={
+                    <Icon size="lg">{getProviderTypeIcon(provider?.spec?.type, isDarkTheme)}</Icon>
+                  }
+                  key={providerName}
+                  value={provider}
+                >
                   {providerName}
                 </SelectOption>
               );
@@ -107,4 +126,4 @@ const ProviderSelect: FC<ProviderSelectProps> = ({
   );
 };
 
-export default ProviderSelect;
+export default forwardRef(ProviderSelect);
